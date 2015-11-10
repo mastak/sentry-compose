@@ -1,0 +1,62 @@
+data:
+  image: busybox
+  volumes:
+    - /var/lib/postgresql
+    - /data
+
+postgres:
+  image: postgres:9
+  environment:
+    - POSTGRES_DB=${DB_NAME}
+    - POSTGRES_USER=${DB_USER}
+    - POSTGRES_PASSWORD=${DB_PASSWORD}
+  expose:
+    - "5432"
+  volumes_from:
+    - data
+  restart: always
+
+redis:
+  image: redis
+  volumes_from:
+    - data
+  expose:
+    - "6379"
+  restart: always
+
+beat:
+  build: .
+  environment:
+    - SENTRY_DB_NAME=${DB_NAME}
+    - SENTRY_DB_USER=${DB_USER}
+    - SENTRY_DB_PASSWORD=${DB_PASSWORD}
+    - SENTRY_ADMIN_EMAIL=${ADMIN_EMAIL}
+  links:
+    - postgres
+    - redis
+  restart: always
+  command: sentry celery beat
+
+worker:
+  build: .
+  environment:
+    - SENTRY_ADMIN_EMAIL=${ADMIN_EMAIL}
+  links:
+    - postgres
+    - redis
+  restart: always
+  command: sentry celery worker
+
+sentry:
+  build: .
+  environment:
+    - SENTRY_DB_NAME=${DB_NAME}
+    - SENTRY_DB_USER=${DB_USER}
+    - SENTRY_DB_PASSWORD=${DB_PASSWORD}
+    - SENTRY_ADMIN_EMAIL=${ADMIN_EMAIL}
+  links:
+    - postgres
+    - redis
+  ports:
+    - "9000:9000"
+  restart: always
