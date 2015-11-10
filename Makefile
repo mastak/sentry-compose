@@ -21,5 +21,9 @@ all:
 	docker-compose run --rm sentry sentry upgrade
 	docker-compose up -d
 
+deploy:
+	docker-compose build sentry worker beat
+	docker-compose up --no-deps -d sentry worker beat
+
 ps:
 	docker-compose ps
