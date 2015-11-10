@@ -31,6 +31,7 @@ beat:
     - SENTRY_DB_USER=${DB_USER}
     - SENTRY_DB_PASSWORD=${DB_PASSWORD}
     - SENTRY_ADMIN_EMAIL=${ADMIN_EMAIL}
+    - SENTRY_URL_PREFIX=${SENTRY_URL_PREFIX}
   links:
     - postgres
     - redis
@@ -41,6 +42,7 @@ worker:
   build: .
   environment:
     - SENTRY_ADMIN_EMAIL=${ADMIN_EMAIL}
+    - SENTRY_URL_PREFIX=${SENTRY_URL_PREFIX}
   links:
     - postgres
     - redis
@@ -54,6 +56,7 @@ sentry:
     - SENTRY_DB_USER=${DB_USER}
     - SENTRY_DB_PASSWORD=${DB_PASSWORD}
     - SENTRY_ADMIN_EMAIL=${ADMIN_EMAIL}
+    - SENTRY_URL_PREFIX=${SENTRY_URL_PREFIX}
   links:
     - postgres
     - redis
