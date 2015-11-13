@@ -27,3 +27,7 @@ deploy:
 
 ps:
 	docker-compose ps
+
+up:
+	docker-compose up -d
+
