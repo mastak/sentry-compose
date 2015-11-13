@@ -1,37 +1,23 @@
-data:
-  image: busybox
-  volumes:
-    - /var/lib/postgresql
-    - /data
-
 postgres:
   image: postgres:9
-  environment:
-    - POSTGRES_DB=${DB_NAME}
-    - POSTGRES_USER=${DB_USER}
-    - POSTGRES_PASSWORD=${DB_PASSWORD}
+  env_file: .env
   expose:
     - "5432"
-  volumes_from:
-    - data
+  volumes:
+    - /var/lib/postgresql
   restart: always
 
 redis:
   image: redis
-  volumes_from:
-    - data
+  volumes:
+    - /data
   expose:
     - "6379"
   restart: always
 
 beat:
   build: .
-  environment:
-    - SENTRY_DB_NAME=${DB_NAME}
-    - SENTRY_DB_USER=${DB_USER}
-    - SENTRY_DB_PASSWORD=${DB_PASSWORD}
-    - SENTRY_ADMIN_EMAIL=${ADMIN_EMAIL}
-    - SENTRY_URL_PREFIX=${SENTRY_URL_PREFIX}
+  env_file: .env
   links:
     - postgres
     - redis
@@ -40,9 +26,7 @@ beat:
 
 worker:
   build: .
-  environment:
-    - SENTRY_ADMIN_EMAIL=${ADMIN_EMAIL}
-    - SENTRY_URL_PREFIX=${SENTRY_URL_PREFIX}
+  env_file: .env
   links:
     - postgres
     - redis
@@ -51,12 +35,7 @@ worker:
 
 sentry:
   build: .
-  environment:
-    - SENTRY_DB_NAME=${DB_NAME}
-    - SENTRY_DB_USER=${DB_USER}
-    - SENTRY_DB_PASSWORD=${DB_PASSWORD}
-    - SENTRY_ADMIN_EMAIL=${ADMIN_EMAIL}
-    - SENTRY_URL_PREFIX=${SENTRY_URL_PREFIX}
+  env_file: .env
   links:
     - postgres
     - redis
