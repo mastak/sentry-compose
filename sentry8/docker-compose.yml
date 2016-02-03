@@ -22,7 +22,7 @@ sentry:
     - postgres
     - redis
   ports:
-    - "9001:9000"
+    - "9000:9000"
   restart: always
 
 beat:
