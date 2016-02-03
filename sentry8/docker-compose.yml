@@ -16,7 +16,7 @@ redis:
   restart: always
 
 sentry:
-  image: sentry
+  image: sentry:8
   env_file: .env
   links:
     - postgres
@@ -26,7 +26,7 @@ sentry:
   restart: always
 
 beat:
-  image: sentry
+  image: sentry:8
   command: sentry celery beat
   env_file: .env
   links:
@@ -35,7 +35,7 @@ beat:
   restart: always
 
 worker:
-  image: sentry
+  image: sentry:8
   command: sentry celery worker
   env_file: .env
   links:
