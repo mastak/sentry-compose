@@ -25,6 +25,8 @@ sentry:
   ports:
     - "9000:9000"
   restart: always
+  volumes:
+    - .:/src
 
 beat:
   image: sentry:8
