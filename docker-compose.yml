@@ -4,41 +4,44 @@ postgres:
   expose:
     - "5432"
   volumes:
-    - /var/lib/postgresql
+    - /data/sentry/postgres:/var/lib/postgresql
   restart: always
 
 redis:
   image: redis
   volumes:
     - /data
+    - /data/sentry/redis:/data
   expose:
     - "6379"
   restart: always
 
-beat:
-  build: .
-  env_file: .env
-  links:
-    - postgres
-    - redis
-  restart: always
-  command: sentry celery beat
-
-worker:
-  build: .
-  env_file: .env
-  links:
-    - postgres
-    - redis
-  restart: always
-  command: sentry celery worker
-
 sentry:
-  build: .
+  image: sentry:8
   env_file: .env
   links:
     - postgres
     - redis
   ports:
     - "9000:9000"
+  restart: always
+  volumes:
+    - .:/src
+
+beat:
+  image: sentry:8
+  command: sentry celery beat
+  env_file: .env
+  links:
+    - postgres
+    - redis
+  restart: always
+
+worker:
+  image: sentry:8
+  command: sentry celery worker
+  env_file: .env
+  links:
+    - postgres
+    - redis
   restart: always
