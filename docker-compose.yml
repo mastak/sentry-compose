@@ -1,47 +1,51 @@
-postgres:
-  image: postgres:9
-  env_file: .env
-  expose:
-    - "5432"
-  volumes:
-    - /data/sentry/postgres:/var/lib/postgresql
-  restart: always
+version: '2'
+services:
+  redis:
+    image: redis
+    volumes:
+      - /data/sentry/redis:/data
+    expose:
+      - "6379"
+    restart: always
+    networks:
+      - sentry
 
-redis:
-  image: redis
-  volumes:
-    - /data
-    - /data/sentry/redis:/data
-  expose:
-    - "6379"
-  restart: always
+  sentry:
+    image: sentry:8.5.1
+    env_file: .env
+    links:
+      - redis
+    ports:
+      - "9000:9000"
+    restart: always
+    networks:
+      - sentry
 
-sentry:
-  image: sentry:8.3.2
-  env_file: .env
-  links:
-    - postgres
-    - redis
-  ports:
-    - "9000:9000"
-  restart: always
-  volumes:
-    - .:/src
+  beat:
+    image: sentry:8.5.1
+    command: sentry celery beat
+    env_file: .env
+    links:
+      - redis
+    restart: always
+    networks:
+      - sentry
 
-beat:
-  image: sentry:8.3.2
-  command: sentry celery beat
-  env_file: .env
-  links:
-    - postgres
-    - redis
-  restart: always
+  worker:
+    image: sentry:8.5.1
+    command: sentry celery worker
+    env_file: .env
+    links:
+      - redis
+    restart: always
+    networks:
+      - sentry
 
-worker:
-  image: sentry:8.3.2
-  command: sentry celery worker
-  env_file: .env
-  links:
-    - postgres
-    - redis
-  restart: always
+networks:
+  sentry:
+    driver: overlay
+    ipam:
+      config:
+      - gateway: 10.70.10.1
+        subnet: 10.70.10.0/24
+      driver: default
