@@ -23,7 +23,7 @@ services:
 
   beat:
     image: sentry:8.5.1
-    command: sentry celery beat
+    command: sentry run cron
     env_file: .env
     links:
       - redis
@@ -33,7 +33,7 @@ services:
 
   worker:
     image: sentry:8.5.1
-    command: sentry celery worker
+    command: sentry run worker
     env_file: .env
     links:
       - redis
