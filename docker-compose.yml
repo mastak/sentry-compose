@@ -3,7 +3,7 @@ services:
   redis:
     image: redis
     volumes:
-      - /data/sentry/redis:/data
+      - ./data/redis:/data
     expose:
       - "6379"
     restart: always
@@ -38,6 +38,16 @@ services:
     links:
       - redis
     restart: always
+    networks:
+      - sentry
+
+  postgres:
+    image: postgres:9.6
+    env_file: .env
+    volumes:
+      - ./data/postgresql_data:/var/lib/postgresql/data
+    ports:
+      - "5432"
     networks:
       - sentry
 
