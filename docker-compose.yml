@@ -7,8 +7,6 @@ services:
     expose:
       - "6379"
     restart: always
-    networks:
-      - sentry
 
   sentry:
     image: sentry:8.14
@@ -18,8 +16,6 @@ services:
     ports:
       - "9000:9000"
     restart: always
-    networks:
-      - sentry
 
   beat:
     image: sentry:8.14
@@ -28,8 +24,6 @@ services:
     links:
       - redis
     restart: always
-    networks:
-      - sentry
 
   worker:
     image: sentry:8.14
@@ -38,24 +32,12 @@ services:
     links:
       - redis
     restart: always
-    networks:
-      - sentry
 
   postgres:
     image: postgres:9.6
     env_file: .env
+    restart: always
     volumes:
       - ./data/postgresql_data:/var/lib/postgresql/data
     ports:
       - "5432"
-    networks:
-      - sentry
-
-networks:
-  sentry:
-    driver: overlay
-    ipam:
-      config:
-      - gateway: 10.70.10.1
-        subnet: 10.70.10.0/24
-      driver: default
